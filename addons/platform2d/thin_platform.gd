@@ -63,7 +63,7 @@ func set_position(p):
 	update_collision_polygon()
 
 func update_collision_polygon():
-	if is_inside_tree() && get_tree().is_editor_hint():
+	if is_inside_tree() && Engine.is_editor_hint():
 		var curve = get_curve()
 		var point_array = baked_points(curve)
 		var point_count = point_array.size()
@@ -127,3 +127,4 @@ func set_material(m):
 	Thickness = m.Thickness
 	Position = m.Position
 	update()
+

@@ -43,8 +43,11 @@ const COLOR_2 = Color(0.5, 0.5, 1, 1)
 const COLOR_3 = Color(1, 0, 0, 1)
 
 func _enter_tree():
-	var godot_version = OS.get_engine_version()
-	is_godot21 = godot_version.major == "2" && godot_version.minor == "1"
+	var godot_version = Engine.get_version_info()
+	is_godot21 = (godot_version.major == 3 && godot_version.minor == 1) or (godot_version.major==3)
+	
+	print(is_godot21)
+	
 	add_custom_type("ThinPlatform",  "StaticBody2D", thin_platform_script,  preload("res://addons/platform2d/thin_platform_icon.png"))
 	add_custom_type("ThickPlatform", "StaticBody2D", thick_platform_script, preload("res://addons/platform2d/thick_platform_icon.png"))
 	handle_tex.set_flags(0)
@@ -57,7 +60,7 @@ func _exit_tree():
 	remove_custom_type("SmartSurface")
 
 func handles(o):
-	if o.is_type("VisibilityNotifier2D"):
+	if o.is_class("VisibilityNotifier2D"):
 		return true
 	elif o.get_script() == thick_platform_script || o.get_script() == thin_platform_script:
 		return true
@@ -66,7 +69,7 @@ func handles(o):
 
 func edit(o):
 	edited_object = o
-	if o.is_type("VisibilityNotifier2D"):
+	if o.is_class("VisibilityNotifier2D"):
 		edited_type = EDIT_VISIBILITY_NOTIFIER
 	else:
 		edited_type = EDIT_PLATFORM
@@ -99,6 +102,7 @@ func update():
 	if is_godot21:
 		editor.update()
 	else:
+		print(is_godot21)
 		update_canvas()
 
 func int_coord(p):
@@ -120,7 +124,7 @@ func forward_draw_over_canvas(canvas_xform, canvas):
 			var p_in
 			var p_out
 			var button_rect
-			p = transform.xform(curve.get_point_pos(i))
+			p = transform.xform(curve.get_point_position(i))  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 			if i == 0 && closed:
 				p_in = p+transform.basis_xform(curve.get_point_in(point_count))
 			else:
@@ -142,7 +146,7 @@ func forward_draw_over_canvas(canvas_xform, canvas):
 				canvas.draw_texture_rect(remove_tex, button_rect, false)
 				buttons.append({ rect = button_rect, type = BUTTON_REMOVE, index = i })
 			if i < curve.get_point_count() - notclosed_int:
-				var p_mid = transform.xform(0.5*(curve.get_point_pos(i)+curve.get_point_pos(i+1))+0.375*(curve.get_point_out(i)+curve.get_point_in(i+1)))
+				var p_mid = transform.xform(0.5*(curve.get_point_position(i)+curve.get_point_position(i+1))+0.375*(curve.get_point_out(i)+curve.get_point_in(i+1)))  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 				button_rect = Rect2(int_coord(p_mid), add_tex.get_size())
 				canvas.draw_texture_rect(add_tex, button_rect, false)
 				buttons.append({ rect = button_rect, type = BUTTON_ADD, index = i })
@@ -165,19 +169,19 @@ func forward_draw_over_canvas(canvas_xform, canvas):
 		canvas.draw_texture_rect(handle_tex, Rect2(int_coord(p)-Vector2(5, 5), Vector2(11, 11)), false)
 		handles.append({ pos = p, mode = HANDLE_VNBOTTOM, index = 0 })
 
-func forward_canvas_input_event(canvas_xform, event):
+func forward_canvas_gui_input(event):  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 	var curve = null
 	if edited_type == EDIT_PLATFORM:
 		curve = edited_object.get_curve()
-	if event.type == InputEvent.MOUSE_BUTTON:
+	if event is InputEventMouseButton:  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 		if event.button_index == BUTTON_LEFT:
 			if event.is_pressed():
 				for b in buttons:
-					if b.rect.has_point(event.pos):
+					if b.rect.has_point(event.position):  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 						if b.type == BUTTON_ADD:
 							# Clicked on an "add" button
-							var p_0 = curve.get_point_pos(b.index)
-							var p_3 = curve.get_point_pos(b.index+1)
+							var p_0 = curve.get_point_position(b.index)  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
+							var p_3 = curve.get_point_position(b.index+1)  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 							var p_1 = p_0 + curve.get_point_out(b.index)
 							var p_2 = p_3 + curve.get_point_in(b.index+1)
 							var p_1_2 = 0.5*(p_1+p_2)
@@ -200,12 +204,12 @@ func forward_canvas_input_event(canvas_xform, event):
 							var undoredo = get_undo_redo()
 							undoredo.create_action("Remove platform control point")
 							undoredo.add_do_method(curve, "remove_point", b.index)
-							undoredo.add_undo_method(curve, "add_point", curve.get_point_pos(b.index), curve.get_point_in(b.index), curve.get_point_out(b.index), b.index)
+							undoredo.add_undo_method(curve, "add_point", curve.get_point_position(b.index), curve.get_point_in(b.index), curve.get_point_out(b.index), b.index)  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 							if closed && b.index == 0:
 								var i = curve.get_point_count() - 1
-								undoredo.add_do_method(curve, "set_point_pos", i-1, curve.get_point_pos(1))
+								undoredo.add_do_method(curve, "set_point_pos", i-1, curve.get_point_position(1))  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 								undoredo.add_do_method(curve, "set_point_in", i-1, curve.get_point_in(1))
-								undoredo.add_undo_method(curve, "set_point_pos", i, curve.get_point_pos(i))
+								undoredo.add_undo_method(curve, "set_point_pos", i, curve.get_point_position(i))  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 								undoredo.add_undo_method(curve, "set_point_in", i, curve.get_point_in(i))
 							undoredo.add_do_method(edited_object, "update_collision_polygon")
 							undoredo.add_undo_method(edited_object, "update_collision_polygon")
@@ -214,13 +218,13 @@ func forward_canvas_input_event(canvas_xform, event):
 						edited_object.update()
 						return true
 				for h in handles:
-					if (event.pos - h.pos).length() < 6:
+					if (event.position - h.pos).length() < 6:  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 						# Activate handle
 						handle_mode = h.mode
 						handle_index = h.index
 						# Keep initial value for undo/redo
 						if handle_mode == HANDLE_POS:
-							handle_pos = curve.get_point_pos(handle_index)
+							handle_pos = curve.get_point_position(handle_index)  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 						elif handle_mode == HANDLE_IN:
 							if closed && handle_index == 0:
 								var i = curve.get_point_count() - 1
@@ -239,10 +243,10 @@ func forward_canvas_input_event(canvas_xform, event):
 				if curve != null:
 					i = curve.get_point_count() - 1
 				if handle_mode == HANDLE_POS:
-					undoredo.add_do_method(curve, "set_point_pos", handle_index, curve.get_point_pos(handle_index))
+					undoredo.add_do_method(curve, "set_point_pos", handle_index, curve.get_point_position(handle_index))  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 					undoredo.add_undo_method(curve, "set_point_pos", handle_index, handle_pos)
 					if closed && handle_index == 0:
-						undoredo.add_do_method(curve, "set_point_pos", i, curve.get_point_pos(i))
+						undoredo.add_do_method(curve, "set_point_pos", i, curve.get_point_position(i))  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 						undoredo.add_undo_method(curve, "set_point_pos", i, handle_pos)
 				elif handle_mode == HANDLE_IN:
 					if closed && handle_index == 0:
@@ -263,30 +267,30 @@ func forward_canvas_input_event(canvas_xform, event):
 				undoredo.commit_action()
 				handle_mode = HANDLE_NONE
 				return true
-	elif event.type == InputEvent.MOUSE_MOTION && handle_mode != HANDLE_NONE:
+	elif event is InputEventMouseMotion && handle_mode != HANDLE_NONE:  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 		var transform_inv = edited_object.get_global_transform().affine_inverse()
 		var viewport_transform_inv = edited_object.get_viewport().get_global_canvas_transform().affine_inverse()
-		var p = transform_inv.xform(viewport_transform_inv.xform(event.pos))
+		var p = transform_inv.xform(viewport_transform_inv.xform(event.position))  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 		if handle_mode == HANDLE_POS:
-			curve.set_point_pos(handle_index, p)
+			curve.set_point_position(handle_index, p)  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 			if closed && handle_index == 0:
-				curve.set_point_pos(curve.get_point_count() - 1, p)
+				curve.set_point_position(curve.get_point_count() - 1, p)  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 		elif handle_mode == HANDLE_IN:
 			if closed && handle_index == 0:
 				var i = curve.get_point_count() - 1
-				curve.set_point_in(i, p-curve.get_point_pos(i))
+				curve.set_point_in(i, p-curve.get_point_position(i))  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 			else:
-				curve.set_point_in(handle_index, p-curve.get_point_pos(handle_index))
+				curve.set_point_in(handle_index, p-curve.get_point_position(handle_index))  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 		elif handle_mode == HANDLE_OUT:
-			curve.set_point_out(handle_index, p-curve.get_point_pos(handle_index))
+			curve.set_point_out(handle_index, p-curve.get_point_position(handle_index))  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 		elif handle_mode == HANDLE_VNLEFT:
-			edited_object.set_rect(Rect2(p.x, rect.pos.y, rect.size.x+rect.pos.x-p.x, rect.size.y))
+			edited_object.set_rect(Rect2(p.x, rect.position.y, rect.size.x+rect.position.x-p.x, rect.size.y))  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 		elif handle_mode == HANDLE_VNRIGHT:
-			edited_object.set_rect(Rect2(rect.pos.x, rect.pos.y, p.x-rect.pos.x, rect.size.y))
+			edited_object.set_rect(Rect2(rect.position.x, rect.position.y, p.x-rect.position.x, rect.size.y))  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 		elif handle_mode == HANDLE_VNTOP:
-			edited_object.set_rect(Rect2(rect.pos.x, p.y, rect.size.x, rect.size.y+rect.pos.y-p.y))
+			edited_object.set_rect(Rect2(rect.position.x, p.y, rect.size.x, rect.size.y+rect.position.y-p.y))  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 		elif handle_mode == HANDLE_VNBOTTOM:
-			edited_object.set_rect(Rect2(rect.pos.x, rect.pos.y, rect.size.x, p.y-rect.pos.y))
+			edited_object.set_rect(Rect2(rect.position.x, rect.position.y, rect.size.x, p.y-rect.position.y))  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 		update()
 		edited_object.update()
 		return true
@@ -294,7 +298,8 @@ func forward_canvas_input_event(canvas_xform, event):
 	return false
 
 # Godot 2.1
-func forward_input_event(event):
+func forward_gui_input(event):  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 	if editor == null:
 		return false
-	return forward_canvas_input_event(editor.get_viewport().get_global_canvas_transform(), event)
+	return forward_canvas_gui_input(editor.get_viewport().get_global_canvas_transform(), event)  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
+

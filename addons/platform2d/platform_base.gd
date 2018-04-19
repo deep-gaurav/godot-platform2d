@@ -5,16 +5,18 @@ var last_position = null
 
 func _ready():
 	if MovingPlatform:
-		set_fixed_process(true)
-		last_position = get_global_pos()
+		set_physics_process(true)  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
+		last_position = get_global_position()  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 
 func set_moving_platform(b):
 	MovingPlatform = b
-	set_fixed_process(MovingPlatform)
-	last_position = get_global_pos()
-
-func _fixed_process(delta):
-	var position = get_global_pos()
+	set_physics_process(MovingPlatform)  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
+	if is_inside_tree():
+		last_position=global_position
+	else:
+		last_position=position
+func _physics_process(delta):  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
+	var position = get_global_position()  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 	set_constant_linear_velocity((position - last_position) / delta)
 	last_position = position
 
@@ -23,16 +25,16 @@ func aligned(p1, p2, p3):
 
 func baked_points_and_length(curve):
 	#return { points = curve.get_baked_points(), length = curve.get_baked_length() }
-	var points = Vector2Array()
+	var points = PoolVector2Array()  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 	var length = 0
 	for i in range(curve.get_point_count()-1):
 		var subcurve = Curve2D.new()
-		subcurve.add_point(curve.get_point_pos(i), curve.get_point_in(i), curve.get_point_out(i))
-		subcurve.add_point(curve.get_point_pos(i+1), curve.get_point_in(i+1), curve.get_point_out(i+1))
+		subcurve.add_point(curve.get_point_position(i), curve.get_point_in(i), curve.get_point_out(i))  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
+		subcurve.add_point(curve.get_point_position(i+1), curve.get_point_in(i+1), curve.get_point_out(i+1))  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 		subcurve.set_bake_interval(curve.get_bake_interval())
 		points.append_array(subcurve.get_baked_points())
 		if i < curve.get_point_count()-2:
-			points.remove(points.size()-1)
+			points.remove(points.size()-1)  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 		length += subcurve.get_baked_length()
 	if points.size() >= 5:
 		var i = 2
@@ -40,7 +42,7 @@ func baked_points_and_length(curve):
 			if    aligned(points[i-2], points[i+2], points[i-1]) \
 			   && aligned(points[i-2], points[i+2], points[i]) \
 			   && aligned(points[i-2], points[i+2], points[i+1]):
-				points.remove(i)
+				points.remove(i)  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 			else:
 				i += 1
 	return { points = points, length = length }
@@ -53,22 +55,22 @@ func baked_length(curve):
 
 func draw_border(point_array, thickness, position, sections, left_overflow = 0.0):
 	var point_count = point_array.size()
-	var points = Vector2Array()
+	var points = PoolVector2Array()  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 	points.push_back(Vector2(0, 0))
 	points.push_back(Vector2(0, 0))
 	points.push_back(Vector2(0, 0))
 	points.push_back(Vector2(0, 0))
-	var colors = ColorArray()
+	var colors = PoolColorArray()  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 	colors.push_back(Color(1.0, 1.0, 1.0))
 	colors.push_back(Color(1.0, 1.0, 1.0))
 	colors.push_back(Color(1.0, 1.0, 1.0))
 	colors.push_back(Color(1.0, 1.0, 1.0))
-	var uvs = Vector2Array()
+	var uvs = PoolVector2Array()  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 	uvs.push_back(Vector2(0, 0))
 	uvs.push_back(Vector2(0, 0))
 	uvs.push_back(Vector2(0, 0))
 	uvs.push_back(Vector2(0, 0))
-	var normal = Vector2Array()
+	var normal = PoolVector2Array()  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 	for i in range(point_count):
 		var i0 = i-1
 		if i0 == -1:
@@ -149,3 +151,4 @@ func draw_border(point_array, thickness, position, sections, left_overflow = 0.0
 		uvs[2] = Vector2(limit, 0)
 		uvs[3] = Vector2(limit, 1)
 		draw_polygon(points, colors, uvs, texture)
+

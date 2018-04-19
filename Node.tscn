@@ -1,0 +1,52 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://addons/platform2d/thin_platform.gd" type="Script" id=1]
+[ext_resource path="res://addons/platform2d/thin_platform_icon.png" type="Texture" id=2]
+[ext_resource path="res://platform2d-example/grass_border.png" type="Texture" id=3]
+[ext_resource path="res://platform2d-example/Ball.tscn" type="PackedScene" id=4]
+
+[sub_resource type="Curve2D" id=1]
+
+bake_interval = 50.0
+_data = {
+"points": PoolVector2Array( 0, 0, 449.121, 0, -584.278, -203.103, -443.959, 5.1626, 424.932, 483.638, 112.083, 41.5333 )
+}
+
+[node name="Node" type="Node"]
+
+[node name="ThinPlatform" type="StaticBody2D" parent="." index="0"]
+
+position = Vector2( 566.27, 329.162 )
+input_pickable = false
+collision_layer = 1
+collision_mask = 1
+constant_linear_velocity = Vector2( 0, 0 )
+constant_angular_velocity = 0.0
+friction = 1.0
+bounce = 0.0
+script = ExtResource( 1 )
+__meta__ = {
+"_editor_icon": ExtResource( 2 )
+}
+MovingPlatform = false
+Curve = SubResource( 1 )
+BakeInterval = 50
+LeftTexture = null
+MidTexture = ExtResource( 3 )
+RightTexture = null
+LeftOverflow = 0.0
+RightOverflow = 0.0
+Thickness = 100
+Position = 0.5
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="ThinPlatform" index="0"]
+
+visible = false
+build_mode = 0
+polygon = PoolVector2Array( -584.278, -203.103, -534.174, -201.973, -484.281, -198.144, -434.915, -190.762, -386.349, -178.563, -339.903, -160.142, -297.007, -134.479, -258.576, -102.54, -222.771, -67.6258, -185.647, -34.1761, -144.207, -6.1648, -98.571, 14.3944, -50.4755, 27.9879, -1.14249, 36.1864, 48.7563, 40.389, 98.7485, 41.6123, 112.083, 41.5333, 112.083, 91.5333, 98.7485, 91.6123, 48.7563, 90.3889, -1.14249, 86.1864, -50.4755, 77.9879, -98.571, 64.3944, -144.207, 43.8352, -185.647, 15.8239, -222.771, -17.6258, -258.576, -52.5397, -297.007, -84.4787, -339.903, -110.142, -386.349, -128.563, -434.915, -140.762, -484.281, -148.144, -534.174, -151.973, -584.278, -153.103 )
+
+[node name="Ball" parent="ThinPlatform" index="1" instance=ExtResource( 4 )]
+
+position = Vector2( -496.03, -304.365 )
+
+

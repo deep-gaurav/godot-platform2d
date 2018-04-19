@@ -91,7 +91,7 @@ func set_angle(a):
 	update()
 
 func update_collision_polygon():
-	if is_inside_tree() && get_tree().is_editor_hint():
+	if is_inside_tree() && Engine.is_editor_hint():
 		var curve = get_curve()
 		var point_array = baked_points(curve)
 		var polygon = get_node("CollisionPolygon2D")
@@ -109,11 +109,11 @@ func _draw():
 	var point_count = point_array.size()
 	if point_count == 0:
 		return
-	point_array.remove(point_count - 1)
+	point_array.remove(point_count - 1)  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 	# Fill
 	if FillTexture != null:
 		var scale = FillSize/FillTexture.get_width()
-		var uvs = Vector2Array()
+		var uvs = PoolVector2Array()  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 		for p in point_array:
 			uvs.append(scale*p)
 		draw_colored_polygon(point_array, Color(1, 1, 1, 1), uvs, FillTexture)
@@ -125,7 +125,7 @@ func _draw():
 			var curve_is_border2
 			var top_curves = []
 			for i in range(curve.get_point_count()):
-				current_curve.add_point(curve.get_point_pos(i), curve.get_point_in(i), curve.get_point_out(i))
+				current_curve.add_point(curve.get_point_position(i), curve.get_point_in(i), curve.get_point_out(i))  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 				var out_normal_angle = curve.get_point_out(i).rotated(PI/2).angle()
 				var is_border2 = abs(out_normal_angle) < Angle
 				if i == 0:
@@ -145,7 +145,7 @@ func _draw():
 					else:
 						top_curves.append(current_curve)
 					current_curve = Curve2D.new()
-					current_curve.add_point(curve.get_point_pos(i), curve.get_point_in(i), curve.get_point_out(i))
+					current_curve.add_point(curve.get_point_position(i), curve.get_point_in(i), curve.get_point_out(i))  #-- NOTE: Automatically converted by Godot 2 to 3 converter, please review
 					curve_is_border2 = is_border2
 			for c in top_curves:
 				c.set_bake_interval(BakeInterval)
@@ -225,3 +225,4 @@ func set_material(m):
 		SideThickness = m.SideThickness
 		SidePosition = m.SidePosition
 	update()
+

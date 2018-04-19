@@ -55,3 +55,4 @@ func _on_SaveMaterial_pressed():
 	dialog.toolbar = self
 	plugin.get_base_control().add_child(dialog)
 	dialog.popup_centered()
+
